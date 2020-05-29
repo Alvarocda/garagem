@@ -18,12 +18,12 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("fabricantes/{codfabricante:int}")]
-        public async Task<ActionResult<List<Modelo>>> ListaModeloPorFabricante([FromServices]DataContext database, int codfabricante){
+        [Route("fabricantes/{CodFabricante:int}")]
+        public async Task<ActionResult<List<Modelo>>> ListaModeloPorFabricante([FromServices]DataContext database, int CodFabricante){
             return await database.Modelos
                 .Include(m => m.Fabricante)
                 .AsNoTracking()
-                .Where(m => m.codfabricante == codfabricante)
+                .Where(m => m.CodFabricante == CodFabricante)
                 .ToListAsync();
         }
 

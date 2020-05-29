@@ -28,7 +28,23 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            IncializaSwagger(services);
             InicializaConexao(services);
+        }
+
+        private static void IncializaSwagger(IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "API Garagem",
+                    Description = "API para estoque de garagem",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact() { Name = "Álvaro Claro", Email = "alvaro.claro@hotmail.com" }
+                });
+                c.IncludeXmlComments("./bin/Debug/netcoreapp3.1/api.xml");
+            });
         }
 
         private void InicializaConexao(IServiceCollection services){
@@ -46,6 +62,12 @@ namespace api
             }
 
             app.UseHttpsRedirection();
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            });
 
             app.UseRouting();
 

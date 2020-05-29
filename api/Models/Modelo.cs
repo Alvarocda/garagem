@@ -7,9 +7,9 @@ namespace api.Models
     public class Modelo
     {
         [Key]
-        public int codmodelo {get;set;}
-        public int codfabricante {get;set;}
+        public int CodModelo {get;set;}
+        public int CodFabricante {get;set;}
         public Fabricante Fabricante {get;set;}
-        public string nome {get;set;}
+        public string Nome {get;set;}
     }
 }
