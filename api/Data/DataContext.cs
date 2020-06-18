@@ -13,5 +13,6 @@ namespace api.Data
         public DbSet<Fabricante> Fabricantes {get;set;}
         public DbSet<Modelo> Modelos {get;set;}
         public DbSet<Usuario> Usuarios {get;set;}
+        public DbSet<Veiculo> Veiculos {get;set;}
     }
 }

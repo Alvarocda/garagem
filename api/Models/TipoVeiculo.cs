@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace api.Models
 {
-    public class TipoVeiculo
+    public class TipoVeiculo : ControlesSistema
     {
         [Key]
-        public int CodTipoVeiculo {get;set;}
+        public int Id {get;set;}
         public string Nome {get;set;}
     }
 }

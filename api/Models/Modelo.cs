@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace api.Models
 {
     [Table("modelos")]
-    public class Modelo
+    public class Modelo : ControlesSistema
     {
         [Key]
-        public int CodModelo {get;set;}
-        public int CodFabricante {get;set;}
+        public int Id {get;set;}
+        public int FabricanteId {get;set;}
         public Fabricante Fabricante {get;set;}
         public string Nome {get;set;}
     }

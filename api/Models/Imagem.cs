@@ -1,9 +1,9 @@
 namespace api.Models
 {
-    public class Imagem
+    public class Imagem : ControlesSistema
     {
-        public int CodImagem {get;set;}
+        public int Id {get;set;}
         public string URL {get;set;}
-        public string CodVeiculo {get;set;}
+        public int VeiculoId {get;set;}
     }
 }
