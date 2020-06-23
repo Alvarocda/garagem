@@ -8,7 +8,7 @@ namespace api.Utils
 {
     public class HashUtils
     {
-        public async Task HasheiaSenhaAsync(dynamic usuario){
+        public async Task HasheiaSenhaAsync(Usuario usuario){
             if(usuario.SenhaString != null && !string.IsNullOrWhiteSpace(usuario.SenhaString)){
                 using(var hmac = new System.Security.Cryptography.HMACSHA512()){
                     usuario.Chave = hmac.Key;
@@ -24,11 +24,11 @@ namespace api.Utils
                 }
             }
         }
-        public async Task<bool> VerificaSenhaHashAsync(dynamic usuario){
-            if(usuario.SenhaString != null && !string.IsNullOrWhiteSpace(usuario.Senha)){
-                if(usuario.Senha.Lenght == 64 && usuario.Chave.Length == 128){
+        public async Task<bool> VerificaSenhaHashAsync(Usuario usuario, string senha){
+            if(senha != null && !string.IsNullOrWhiteSpace(senha)){
+                if(usuario.Senha.Length == 64 && usuario.Chave.Length == 128){
                     using(var hmac = new System.Security.Cryptography.HMACSHA512(usuario.Chave)){
-                        var ComputedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(usuario.SenhaString));
+                        var ComputedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(senha));
                         for(int i = 0; i < ComputedHash.Length; i++){
                             if(ComputedHash[i] != usuario.Senha[i]){
                                 return false;

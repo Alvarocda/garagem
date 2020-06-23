@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,12 +22,17 @@ namespace api.Controllers
             _repository = repository;
 
         }
+        [Authorize(Roles = "administrador")]
         [HttpGet]
         public async Task<ActionResult<List<Fabricante>>> ListaFabricantes()
         {
             return await _context.Fabricantes.AsNoTracking().ToListAsync();
         }
 
+        [HttpGet("modelos/{fabricanteId}")]
+        public async Task<ActionResult<Fabricante>> ListaModelosDoFabricante(int fabricanteId){
+            return await _context.Fabricantes.AsNoTracking().Include(f => f.Modelos).Where(f => f.Id == fabricanteId).FirstOrDefaultAsync();
+        }
         [HttpPost]
         public async Task<ActionResult<Fabricante>> CadastraFabricante( [FromBody] Fabricante fabricante)
         {

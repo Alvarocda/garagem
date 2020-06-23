@@ -20,5 +20,6 @@ namespace api.Models
         public byte[] Chave {get;set;}
         [Required(ErrorMessage = "Por favor, informe um nome para o usuário")]
         public string Nome {get;set;}
+        public string Role {get;set;} = "usuario";
     }
 }

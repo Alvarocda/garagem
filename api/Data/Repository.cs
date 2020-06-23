@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using api.Models;
 
 namespace api.Data
 {
@@ -9,7 +10,7 @@ namespace api.Data
         {
             _context = context;
         }
-        public void AddA<T>(T entity) where T : class
+        public void Add<T>(T entity) where T : class
         {
             _context.Add<T>(entity);
         }
@@ -22,6 +23,11 @@ namespace api.Data
         public void Delete<T>(T entity) where T : class
         {
             _context.Remove<T>(entity);
+        }
+
+        public Veiculo GetVehicle(int VeiculoId)
+        {
+            throw new System.NotImplementedException();
         }
 
         public bool SaveChanges<T>(T entity) where T : class

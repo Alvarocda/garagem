@@ -8,8 +8,9 @@ namespace api.Models
     {
         [Key]
         public int Id {get;set;}
+        public string Nome {get;set;}
         public int FabricanteId {get;set;}
         public Fabricante Fabricante {get;set;}
-        public string Nome {get;set;}
+        
     }
 }
