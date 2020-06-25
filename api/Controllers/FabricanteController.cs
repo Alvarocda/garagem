@@ -26,6 +26,7 @@ namespace api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Fabricante>>> ListaFabricantes()
         {
+            Console.WriteLine(User.Identity);
             return await _context.Fabricantes.AsNoTracking().ToListAsync();
         }
 

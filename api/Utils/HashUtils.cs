@@ -8,11 +8,11 @@ namespace api.Utils
 {
     public class HashUtils
     {
-        public async Task HasheiaSenhaAsync(Usuario usuario){
-            if(usuario.SenhaString != null && !string.IsNullOrWhiteSpace(usuario.SenhaString)){
+        public async Task HasheiaSenhaAsync(Usuario usuario, string senha){
+            if(!string.IsNullOrEmpty(senha) && !string.IsNullOrWhiteSpace(senha)){
                 using(var hmac = new System.Security.Cryptography.HMACSHA512()){
                     usuario.Chave = hmac.Key;
-                    usuario.Senha = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(usuario.SenhaString));
+                    usuario.Senha = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(senha));
                 }
             }
         }

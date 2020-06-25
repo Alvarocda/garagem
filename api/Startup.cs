@@ -43,7 +43,6 @@ namespace api
         }
         private static void InicializaRepositorios(IServiceCollection services){
             services.AddScoped<IRepository, Repository>();
-            services.AddScoped<IUserRepository, UserRepository>();
         }
         private static void InicializaJwtAuthentication(IServiceCollection services){
             var key = Encoding.ASCII.GetBytes(Settings.Secret);

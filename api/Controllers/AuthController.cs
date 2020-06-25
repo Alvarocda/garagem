@@ -15,12 +15,12 @@ namespace api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DataContext _context;
-        private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
-        public AuthController(DataContext context, IUserRepository repository, IMapper mapper)
+        private readonly IRepository _repository;
+        public AuthController(DataContext context, IMapper mapper, IRepository repository)
         {
-            _mapper = mapper;
             _repository = repository;
+            _mapper = mapper;
             _context = context;
 
         }

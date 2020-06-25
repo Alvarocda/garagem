@@ -11,9 +11,6 @@ namespace api.Models
         public int Id {get;set;}
         [Required(ErrorMessage = "Por favor, informe um email para o usuário")]
         public string Email {get;set;}
-        [NotMapped]
-        [Required(ErrorMessage = "Por favor, informe uma senha para o usuário")]
-        public string SenhaString {get;set;}
         [JsonIgnore]
         public byte[] Senha {get;set;}
         [JsonIgnore]
