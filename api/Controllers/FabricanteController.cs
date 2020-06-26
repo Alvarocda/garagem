@@ -22,27 +22,33 @@ namespace api.Controllers
             _repository = repository;
 
         }
-        [Authorize(Roles = "administrador")]
         [HttpGet]
-        public async Task<ActionResult<List<Fabricante>>> ListaFabricantes()
+        [Authorize(Roles = "administrador,usuario")]
+        public async Task<ActionResult<List<Fabricante>>> ListaFabricantes([FromQuery] bool listamodelos = false, [FromQuery] bool listaDesativados = false)
         {
-            Console.WriteLine(User.Identity);
-            return await _context.Fabricantes.AsNoTracking().ToListAsync();
+            return await _repository.GetFabricantes(listamodelos, listaDesativados);
         }
 
-        [HttpGet("modelos/{fabricanteId}")]
-        public async Task<ActionResult<Fabricante>> ListaModelosDoFabricante(int fabricanteId){
-            return await _context.Fabricantes.AsNoTracking().Include(f => f.Modelos).Where(f => f.Id == fabricanteId).FirstOrDefaultAsync();
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "administrador,usuario")]
+        public async Task<ActionResult<Fabricante>> SelecionaFabricante([FromRoute] int id, [FromQuery] bool listaModelos = false){
+            return await _repository.GetFabricante(id, listaModelos);
         }
+
         [HttpPost]
-        public async Task<ActionResult<Fabricante>> CadastraFabricante( [FromBody] Fabricante fabricante)
+        [Authorize(Roles = "administrador,usuario")]
+        public async Task<ActionResult<Fabricante>> CadastraFabricante([FromBody] Fabricante fabricante)
         {
             if (ModelState.IsValid)
             {
+                Fabricante jaExiste = await _repository.GetFabricanteByName(fabricante.Nome);
+                if(jaExiste != null){
+                    return BadRequest(new {status = false, message = $"Já existe um fabricante com o nome {fabricante.Nome} cadastrado!"});
+                }
                 fabricante.CriadoEm = DateTime.Now;
                 await _repository.AddAsync(fabricante);
                 if(await _repository.SaveChangesAsync()){
-                    return fabricante;
+                    return Ok(new {status = true, message = "Fabricante cadastrado com sucesso!", fabricante});
                 }
                 return BadRequest();
             }
@@ -51,15 +57,19 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
         }
-        [HttpPut]
-        public async Task<ActionResult<Fabricante>> UpdateFabricante(Fabricante fabricante)
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "administrador")]
+        public async Task<ActionResult<Fabricante>> UpdateFabricante([FromRoute] int id, [FromBody] Fabricante fabricante)
         {
             if (ModelState.IsValid)
             {
                 fabricante.AtualizadoEm = DateTime.Now;
+                fabricante.AtualizadoPor = User.RetornaIdUsuario();
                 _context.Entry(fabricante).State = EntityState.Modified;
+                _context.Entry(fabricante).Property(f => f.CriadoEm).IsModified = false;
+                _context.Entry(fabricante).Property(f => f.CriadoPor).IsModified = false;
                 if(await _repository.SaveChangesAsync()){
-                    return fabricante;
+                    return Ok(new {status = true, message = "Fabricante alterado com sucesso!", fabricante});
                 }
                 return BadRequest();
             }
@@ -68,14 +78,26 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
         }
-        [HttpDelete]
-        public async Task<ActionResult<Fabricante>> DeleteFabricante(Fabricante fabricante)
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "administrador")]
+        public async Task<ActionResult<Fabricante>> DesativaFabricante([FromRoute] int id)
         {
             if (ModelState.IsValid)
             {
+                Fabricante fabricante = await _repository.GetFabricante(id);
+                if(fabricante == null){
+                    return NotFound();
+                }
                 fabricante.DesativadoEm = DateTime.Now;
+                fabricante.DesativadoPor = User.RetornaIdUsuario();
+                fabricante.Ativo = false;
+                _context.Entry(fabricante).State = EntityState.Modified;
+                _context.Entry(fabricante).Property(f => f.CriadoEm).IsModified = false;
+                _context.Entry(fabricante).Property(f => f.CriadoPor).IsModified = false;
+                _context.Entry(fabricante).Property(f => f.AtualizadoEm).IsModified = false;
+                _context.Entry(fabricante).Property(f => f.AtualizadoPor).IsModified = false;
                 if(await _repository.SaveChangesAsync()){
-                    return fabricante;
+                    return Ok(new {status = true, message = "Fabricante desativado com sucesso!"});
                 }
                 return BadRequest();
             }

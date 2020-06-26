@@ -22,19 +22,9 @@ namespace api.Controllers
 
         }
         [HttpGet]
-        public async Task<ActionResult<List<Modelo>>> ListaModelos()
+        public async Task<ActionResult<List<Modelo>>> ListaModelos([FromQuery] bool incluiFabricante = false, [FromQuery] bool incluiDesativados = false)
         {
-            return await _context.Modelos.Include(m => m.Fabricante).AsNoTracking().ToListAsync();
-        }
-
-        [HttpGet]
-        [Route("fabricante/{fabricanteId:int}")]
-        public async Task<ActionResult<List<Modelo>>> ListaModeloPorFabricante(int fabricanteId)
-        {
-            return await _context.Modelos
-                .AsNoTracking()
-                .Where(m => m.FabricanteId == fabricanteId)
-                .ToListAsync();
+            return await _repository.GetModelos(incluiFabricante, incluiDesativados);
         }
 
         [HttpPost]
@@ -42,13 +32,17 @@ namespace api.Controllers
         {
             if (ModelState.IsValid)
             {
+                Modelo jaExiste = await _repository.CheckIfModeloIsAlreadyRegistered(modelo.FabricanteId, modelo.Nome);
+                if(jaExiste != null){
+                    return BadRequest(new {status = false, message = $"O modelo {modelo.Nome} já esta cadastrado"});
+                }
                 modelo.CriadoEm = DateTime.Now;
+                modelo.CriadoPor = User.RetornaIdUsuario();
                 await _repository.AddAsync(modelo);
                 if(await _repository.SaveChangesAsync()){
-                    return modelo;
+                    return Ok(new {status = true, message = "Modelo cadastrado com sucesso!", modelo});
                 }
                 return BadRequest();
-                
             }
             else
             {

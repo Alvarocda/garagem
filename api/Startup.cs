@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
+using Microsoft.OpenApi.Models;
 
 namespace api
 {
@@ -71,6 +72,32 @@ namespace api
                     Description = "API para estoque de garagem",
                     Contact = new Microsoft.OpenApi.Models.OpenApiContact() { Name = "Álvaro Claro", Email = "alvaro.claro@hotmail.com" }
                 });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+                    Description = "Token JWT Bearer",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                
+                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                    {
+                        {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+
+                            },
+                            new List<string>()
+                        }
+                    });
                 c.IncludeXmlComments("./bin/Debug/netcoreapp3.1/api.xml");
             });
         }

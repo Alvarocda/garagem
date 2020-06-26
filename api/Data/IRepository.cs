@@ -16,16 +16,24 @@ namespace api.Data
 
         // Veiculos
         Task<Veiculo> GetVehicle(int veiculoId, bool incluiModeloEFabricante = false);
-        Task<List<Veiculo>> GetVehicles(bool incluiModeloEFabricante = false);
+        Task<List<Veiculo>> GetVehicles(bool incluiModeloEFabricante = false, bool incluiDesativados = false);
 
         // Usuários
         Task<Usuario> GetUsuario(int usuarioId);
-        Task<List<Usuario>> GetUsuarios();
-        Task<Usuario> CheckIfEmailIsAlreadyRegistered(string email, int usuarioId = 0);
+        Task<List<Usuario>> GetUsuarios(bool incluiDesativados = false);
+        Task<Usuario> CheckIfEmailIsAlreadyRegistered(string email, int usuarioId);
         Task<Usuario> GetUserByEmail(string email);
 
         // Modelos
         Task<Modelo> GetModelo(int modeloId, bool incluiFabricante);
-        Task<List<Modelo>> GetModelos(bool incluiFabricante);
+        Task<List<Modelo>> GetModelos(bool incluiFabricante, bool incluiDesativados = false);
+        Task<Modelo> CheckIfModeloIsAlreadyRegistered(int fabricanteId, string nome);
+
+        // Fabricante
+
+        Task<Fabricante> GetFabricante(int fabricanteId, bool incluiModelos = false);
+        Task<List<Fabricante>> GetFabricantes(bool incluiModelos = false, bool incluiDesativados = false);
+        Task<Fabricante> GetFabricanteByName(string nome);
+        Task<Fabricante> CheckIfFabricanteIsAlreadyRegisted(string nome, int id = 0);
     }
 }

@@ -45,11 +45,11 @@ namespace api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "administrador")]
-        public async Task<ActionResult<Usuario>> CadastraUsuario(UsuarioDTO usuario)
+        public async Task<ActionResult<Usuario>> CadastraUsuario([FromBody] UsuarioDTO usuario)
         {
             if (ModelState.IsValid)
             {
-                Usuario jaExiste = await _repository.CheckIfEmailIsAlreadyRegistered(usuario.Email);
+                Usuario jaExiste = await _repository.GetUserByEmail(usuario.Email);
                 if(jaExiste != null){
                     return BadRequest(new {status = false, message = $"Já existe um usuário com o email {usuario.Email} cadastrado, por favor, utilize outro"});
                 }
@@ -85,7 +85,7 @@ namespace api.Controllers
         /// <returns></returns>
         [HttpPut("{id:int}")]
         [Authorize(Roles = "administrador")]
-        public async Task<ActionResult<Usuario>> AlteraUsuario(int id, Usuario usuario)
+        public async Task<ActionResult<Usuario>> AlteraUsuario([FromRoute] int id, [FromBody]Usuario usuario)
         {
             if (ModelState.IsValid)
             {
@@ -132,7 +132,7 @@ namespace api.Controllers
         /// <returns></returns>
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "administrador")]
-        public async Task<ActionResult<Usuario>> DesativaUsuario(int id)
+        public async Task<ActionResult<Usuario>> DesativaUsuario([FromRoute] int id)
         {
             if (ModelState.IsValid)
             {
@@ -161,7 +161,7 @@ namespace api.Controllers
 
         [HttpPatch]
         [Authorize(Roles = "administrador,usuario")]
-        public async Task<ActionResult<dynamic>> AlteraSenhaUsuario(UsuarioDTO usuarioDto){
+        public async Task<ActionResult<dynamic>> AlteraSenhaUsuario([FromBody] UsuarioDTO usuarioDto){
             Usuario usuario = await _repository.GetUsuario(usuarioDto.Id);
             if(usuario == null){
                 return BadRequest();

@@ -24,13 +24,13 @@ namespace api.Controllers
 
         [HttpGet]
         [Authorize(Roles= "administrador,usuario")]
-        public async Task<ActionResult<List<Veiculo>>> GetVeiculos(bool listaFabricantes){
+        public async Task<ActionResult<List<Veiculo>>> GetVeiculos([FromQuery] bool listaFabricantes){
             return await _repository.GetVehicles(listaFabricantes);
         }
 
         [Authorize(Roles = "administrador, usuario")]
         [HttpPost]
-        public async Task<ActionResult<Veiculo>> CadastraVeiculo(Veiculo veiculo){
+        public async Task<ActionResult<Veiculo>> CadastraVeiculo([FromBody]Veiculo veiculo){
             if(ModelState.IsValid){
                 veiculo.CriadoEm = DateTime.Now;
                 veiculo.CriadoPor = User.RetornaIdUsuario();
@@ -44,7 +44,7 @@ namespace api.Controllers
         }
         [Authorize(Roles = "administrador,usuario")]
         [HttpPut("{veiculoId}")]
-        public async Task<ActionResult<Veiculo>> UpdateVeiculo(int veiculoId, Veiculo veiculo){
+        public async Task<ActionResult<Veiculo>> UpdateVeiculo([FromRoute] int veiculoId, [FromBody]Veiculo veiculo){
             if(ModelState.IsValid){
                 _context.Entry(veiculo).State = EntityState.Modified;
                 veiculo.AtualizadoEm = DateTime.Now;
@@ -61,8 +61,8 @@ namespace api.Controllers
         }
 
         [HttpDelete("{veiculoId}")]
-        [Authorize(Roles = "administrador,usuario")]
-        public async Task<ActionResult<object>> DeleteVeiculo(int veiculoId){
+        [Authorize(Roles = "administrador")]
+        public async Task<ActionResult<object>> DeleteVeiculo([FromRoute] int veiculoId){
             Veiculo veiculo = await _repository.GetVehicle(veiculoId);
             if(veiculo == null){
                 return BadRequest();
