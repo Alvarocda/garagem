@@ -40,10 +40,6 @@ namespace api
             InicializaJwtAuthentication(services);
             IncializaSwagger(services);
             InicializaConexao(services);
-            InicializaRepositorios(services);
-        }
-        private static void InicializaRepositorios(IServiceCollection services){
-            services.AddScoped<IRepository, Repository>();
         }
         private static void InicializaJwtAuthentication(IServiceCollection services){
             var key = Encoding.ASCII.GetBytes(Settings.Secret);

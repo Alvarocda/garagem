@@ -1,10 +1,13 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class ControlesSistema
+    public class EntityBase
     {
+        [Key]
+        public int Id {get;set;}
         [JsonIgnore]
         public int CriadoPor {get;set;}
         [JsonIgnore]

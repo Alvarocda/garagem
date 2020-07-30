@@ -1,8 +1,7 @@
 namespace api.Models
 {
-    public class Imagem : ControlesSistema
+    public class Imagem : EntityBase
     {
-        public int Id {get;set;}
         public string URL {get;set;}
         public int VeiculoId {get;set;}
     }

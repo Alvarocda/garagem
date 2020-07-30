@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,9 @@ namespace api.Controllers
     [Route("v1/[Controller]")]
     public class ModeloController : ControllerBase
     {
-        private readonly IRepository _repository;
+        private readonly IRepository<Modelo> _repository;
         private readonly DataContext _context;
-        public ModeloController(DataContext context, IRepository repository)
+        public ModeloController(DataContext context, IRepository<Modelo> repository)
         {
             _context = context;
             _repository = repository;
@@ -24,7 +25,23 @@ namespace api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Modelo>>> ListaModelos([FromQuery] bool incluiFabricante = false, [FromQuery] bool incluiDesativados = false)
         {
-            return await _repository.GetModelos(incluiFabricante, incluiDesativados);
+            IQueryable<Modelo> modelos = _repository.Query();
+            if (incluiFabricante)
+            {
+                modelos = modelos.Include(m => m.Fabricante);
+            }
+            if (incluiDesativados)
+            {
+                modelos = modelos.Where(m => m.Ativo == false);
+                return await modelos
+                    .OrderByDescending(m => m.Id)
+                    .ToListAsync();
+            }
+            return await modelos
+                .OrderByDescending(m => m.Id)
+                .Where(m => m.Ativo == true)
+                .ToListAsync();
+            
         }
 
         [HttpPost]
@@ -32,15 +49,17 @@ namespace api.Controllers
         {
             if (ModelState.IsValid)
             {
-                Modelo jaExiste = await _repository.CheckIfModeloIsAlreadyRegistered(modelo.FabricanteId, modelo.Nome);
-                if(jaExiste != null){
-                    return BadRequest(new {status = false, message = $"O modelo {modelo.Nome} já esta cadastrado"});
+                Modelo jaExiste = await _repository
+                                                    .FirstOrDefault(m => m.FabricanteId == modelo.FabricanteId && m.Nome.ToLower() == modelo.Nome.ToLower());
+                if (jaExiste != null)
+                {
+                    return BadRequest(new { status = false, message = $"O modelo {modelo.Nome} já esta cadastrado" });
                 }
-                modelo.CriadoEm = DateTime.Now;
                 modelo.CriadoPor = User.RetornaIdUsuario();
                 await _repository.AddAsync(modelo);
-                if(await _repository.SaveChangesAsync()){
-                    return Ok(new {status = true, message = "Modelo cadastrado com sucesso!", modelo});
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok(new { status = true, message = "Modelo cadastrado com sucesso!", modelo });
                 }
                 return BadRequest();
             }

@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace api.Models
 {
     [Table("veiculos")]
-    public class Veiculo : ControlesSistema
+    public class Veiculo : EntityBase
     {
-        [Key]
-        public int Id {get;set;}
         public int ModeloId {get;set;}
         public Modelo Modelo {get;set;}
         public string Ano {get;set;}
@@ -22,5 +20,6 @@ namespace api.Models
         // V = Vendido
         // R = Removido
         public string Status {get;set;} = "D";
+        public Fabricante Fabricante {get;set;}
     }
 }

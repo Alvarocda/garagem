@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using api.Data;
 using api.DTO;
+using api.Interfaces;
 using api.Models;
 using api.Services;
 using api.Utils;
@@ -16,13 +17,12 @@ namespace api.Controllers
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly IRepository _repository;
-        public AuthController(DataContext context, IMapper mapper, IRepository repository)
+        private readonly IRepository<Usuario> _repository;
+        public AuthController(DataContext context, IMapper mapper, IRepository<Usuario>  repository)
         {
             _repository = repository;
             _mapper = mapper;
             _context = context;
-
         }
 
         [HttpPost]
@@ -30,7 +30,7 @@ namespace api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login(UsuarioDTO authUsuario)
         {
-            Usuario usuario = await _repository.GetUserByEmail(authUsuario.Email);
+            Usuario usuario = await _repository.FirstOrDefault(u => u.Email.ToLower() == authUsuario.Email);
             if (usuario == null)
             {
                 return NotFound(new { status = false, message = "Usuário não encontrado" });

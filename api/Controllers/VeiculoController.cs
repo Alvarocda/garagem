@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using api.Data;
+using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +16,9 @@ namespace api.Controllers
     [Route("v1/[Controller]")]
     public class VeiculoController : ControllerBase
     {
-        private readonly IRepository _repository;
+        private readonly IRepository<Veiculo> _repository;
         private readonly DataContext _context;
-        public VeiculoController(DataContext context, IRepository repository)
+        public VeiculoController(DataContext context, IRepository<Veiculo> repository)
         {
             _context = context;
             _repository = repository;
@@ -25,7 +27,11 @@ namespace api.Controllers
         [HttpGet]
         [Authorize(Roles= "administrador,usuario")]
         public async Task<ActionResult<List<Veiculo>>> GetVeiculos([FromQuery] bool listaFabricantes){
-            return await _repository.GetVehicles(listaFabricantes);
+            IQueryable<Veiculo> veiculos = _repository.Query();
+            if(listaFabricantes){
+                veiculos = veiculos.Include(v => v.Fabricante);
+            }
+            return await veiculos.OrderByDescending(v => v.Id).ToListAsync();
         }
 
         [Authorize(Roles = "administrador, usuario")]
@@ -63,7 +69,7 @@ namespace api.Controllers
         [HttpDelete("{veiculoId}")]
         [Authorize(Roles = "administrador")]
         public async Task<ActionResult<object>> DeleteVeiculo([FromRoute] int veiculoId){
-            Veiculo veiculo = await _repository.GetVehicle(veiculoId);
+            Veiculo veiculo = await _repository.Find(veiculoId);
             if(veiculo == null){
                 return BadRequest();
             }

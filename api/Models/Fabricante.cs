@@ -5,10 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace api.Models
 {
     [Table("fabricantes")]
-    public class Fabricante : ControlesSistema
+    public class Fabricante : EntityBase
     {
-        [Key]
-        public int Id {get;set;}
         public string Nome {get;set;}
         [ForeignKey("FabricanteId")]
         public ObservableCollection<Modelo> Modelos{get;set;}

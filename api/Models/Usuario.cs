@@ -5,10 +5,8 @@ using System.Text.Json.Serialization;
 namespace api.Models
 {
     [Table("usuarios")]
-    public class Usuario : ControlesSistema
+    public class Usuario : EntityBase
     {
-        [Key]
-        public int Id {get;set;}
         [Required(ErrorMessage = "Por favor, informe um email para o usuário")]
         public string Email {get;set;}
         [JsonIgnore]

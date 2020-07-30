@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using api.Data;
 using api.DTO;
+using api.Interfaces;
 using api.Models;
 using api.Utils;
 using AutoMapper;
@@ -19,9 +20,9 @@ namespace api.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly DataContext _context;
-        private readonly IRepository _repository;
+        private readonly IRepository<Usuario> _repository;
         private readonly IMapper _mapper;
-        public UsuarioController(DataContext context, IRepository repository, IMapper mapper)
+        public UsuarioController(DataContext context, IRepository<Usuario> repository, IMapper mapper)
         {
             _mapper = mapper;
             _repository = repository;
@@ -35,7 +36,7 @@ namespace api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Usuario>>> ListaUsuarios()
         {
-            return await _repository.GetUsuarios();
+            return await _repository.ListAsync();
         }
 
         /// <summary>
@@ -49,16 +50,15 @@ namespace api.Controllers
         {
             if (ModelState.IsValid)
             {
-                Usuario jaExiste = await _repository.GetUserByEmail(usuario.Email);
+                Usuario jaExiste = await _repository.FirstOrDefault(u => u.Email.ToLower() == usuario.Email.ToLower());
                 if(jaExiste != null){
                     return BadRequest(new {status = false, message = $"Já existe um usuário com o email {usuario.Email} cadastrado, por favor, utilize outro"});
                 }
                 HashUtils hash = new HashUtils();
                 Usuario novoUsuario = _mapper.Map<Usuario>(usuario);
                 await hash.HasheiaSenhaAsync(novoUsuario, usuario.SenhaString);
-                novoUsuario.CriadoEm = DateTime.Now;
                 novoUsuario.CriadoPor = User.RetornaIdUsuario();
-                await _repository.AddAsync<Usuario>(novoUsuario);
+                await _repository.AddAsync(novoUsuario);
                 try
                 {
                     if(await _repository.SaveChangesAsync()){
@@ -93,7 +93,7 @@ namespace api.Controllers
                 {
                     return NotFound();
                 }
-                Usuario jaExiste = await _repository.CheckIfEmailIsAlreadyRegistered(usuario.Email, id);
+                Usuario jaExiste = await _repository.FirstOrDefault(u => u.Id != usuario.Id && u.Email.ToLower() == usuario.Email.ToLower());
                 if(jaExiste != null){
                     return BadRequest(new {status = false, message = $"Já existe um usuário com o email {usuario.Email} cadastrado, por favor, utilize outro"});
                 }
@@ -136,7 +136,7 @@ namespace api.Controllers
         {
             if (ModelState.IsValid)
             {
-                Usuario usuario = await _repository.GetUsuario(id);
+                Usuario usuario = await _repository.Find(id);
                 if(usuario == null){
                     return NotFound();
                 }
@@ -162,7 +162,7 @@ namespace api.Controllers
         [HttpPatch]
         [Authorize(Roles = "administrador,usuario")]
         public async Task<ActionResult<dynamic>> AlteraSenhaUsuario([FromBody] UsuarioDTO usuarioDto){
-            Usuario usuario = await _repository.GetUsuario(usuarioDto.Id);
+            Usuario usuario = await _repository.Find(usuarioDto.Id);
             if(usuario == null){
                 return BadRequest();
             }

@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace api.Models
 {
-    public class TipoVeiculo : ControlesSistema
+    public class TipoVeiculo : EntityBase
     {
-        [Key]
-        public int Id {get;set;}
         public string Nome {get;set;}
     }
 }
