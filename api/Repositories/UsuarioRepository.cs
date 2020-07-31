@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
 {
-    public class UsuarioRepository : IRepository<Usuario>
+    public class UsuarioRepository : IUsuarioRepository<Usuario>
     {
         readonly DataContext _context;
         public UsuarioRepository(DataContext context)
@@ -20,6 +20,19 @@ namespace api.Repositories
         public async Task AddAsync(Usuario entity)
         {
             await _context.Usuarios.AddAsync(entity);
+        }
+
+        public void Disable(Usuario entity)
+        {
+            entity.DesativadoEm = DateTime.Now;
+            entity.Ativo = false;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(u => u.Senha).IsModified = false;
+            _context.Entry(entity).Property(u => u.Chave).IsModified = false;
+            _context.Entry(entity).Property(u => u.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.CriadoPor).IsModified = false;
+            _context.Entry(entity).Property(u => u.AtualizadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.AtualizadoPor).IsModified = false;
         }
 
         public async Task<Usuario> Find(int id)
@@ -49,15 +62,32 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(Usuario entity)
+        public void Update(Usuario entity)
         {
-            throw new NotImplementedException();
+            entity.AtualizadoEm = DateTime.Now;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(u => u.Senha).IsModified = false;
+            _context.Entry(entity).Property(u => u.Chave).IsModified = false;
+            _context.Entry(entity).Property(u => u.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.CriadoPor).IsModified = false;
+            _context.Entry(entity).Property(u => u.DesativadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.DesativadoPor).IsModified = false;
+        }
+
+        public void UpdatePassword(Usuario entity)
+        {
+            entity.AtualizadoEm = DateTime.Now;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(u => u.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.CriadoPor).IsModified = false;
+            _context.Entry(entity).Property(u => u.DesativadoEm).IsModified = false;
+            _context.Entry(entity).Property(u => u.DesativadoPor).IsModified = false;
         }
     }
 }

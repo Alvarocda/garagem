@@ -22,6 +22,11 @@ namespace api.Repositories
             await _context.TiposVeiculo.AddAsync(entity);
         }
 
+        public void Disable(TipoVeiculo entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<TipoVeiculo> Find(int id)
         {
             return await _context.TiposVeiculo.FindAsync(id);
@@ -49,13 +54,13 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(TipoVeiculo entity)
+        public void Update(TipoVeiculo entity)
         {
             throw new System.NotImplementedException();
         }

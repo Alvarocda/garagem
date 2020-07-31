@@ -22,6 +22,11 @@ namespace api.Repositories
             await _context.Imagens.AddAsync(entity);
         }
 
+        public void Disable(Imagem entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Imagem> Find(int id)
         {
             return await _context.Imagens.FindAsync(id);
@@ -49,13 +54,13 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(Imagem entity)
+        public void Update(Imagem entity)
         {
             throw new NotImplementedException();
         }

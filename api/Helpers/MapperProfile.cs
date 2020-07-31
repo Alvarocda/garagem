@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using api.DTO;
 using api.Models;
 using AutoMapper;
@@ -10,6 +11,7 @@ namespace api.Helpers
         {
             CreateMap<UsuarioDTO, Usuario>();
             CreateMap<Usuario, UsuarioDTO>();
+            CreateMap<List<UsuarioDTO>, List<Usuario>>();
         }
     }
 }

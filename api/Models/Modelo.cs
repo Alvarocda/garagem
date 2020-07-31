@@ -6,9 +6,12 @@ namespace api.Models
     [Table("modelos")]
     public class Modelo : EntityBase
     {
-        public string Nome {get;set;}
-        public int FabricanteId {get;set;}
-        public Fabricante Fabricante {get;set;}
-        
+        [Required]
+        [MaxLength(50)]
+        public string Nome { get; set; }
+        [Required]
+        public int FabricanteId { get; set; }
+        public Fabricante Fabricante { get; set; }
+
     }
 }

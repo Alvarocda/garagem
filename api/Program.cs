@@ -20,7 +20,6 @@ namespace api
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseSetting("http_port","443");
                     webBuilder.UseStartup<Startup>();
                 });
     }

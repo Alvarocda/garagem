@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.Interfaces;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +16,8 @@ namespace api.Controllers
     public class ModeloController : ControllerBase
     {
         private readonly IRepository<Modelo> _repository;
-        private readonly DataContext _context;
-        public ModeloController(DataContext context, IRepository<Modelo> repository)
+        public ModeloController(IRepository<Modelo> repository)
         {
-            _context = context;
             _repository = repository;
 
         }
@@ -41,16 +40,16 @@ namespace api.Controllers
                 .OrderByDescending(m => m.Id)
                 .Where(m => m.Ativo == true)
                 .ToListAsync();
-            
+
         }
 
         [HttpPost]
+        [Authorize("administrador,usuario")]
         public async Task<ActionResult<Modelo>> CadastraModelo([FromBody] Modelo modelo)
         {
             if (ModelState.IsValid)
             {
-                Modelo jaExiste = await _repository
-                                                    .FirstOrDefault(m => m.FabricanteId == modelo.FabricanteId && m.Nome.ToLower() == modelo.Nome.ToLower());
+                Modelo jaExiste = await _repository.FirstOrDefault(m => m.FabricanteId == modelo.FabricanteId && m.Nome.ToLower() == modelo.Nome.ToLower());
                 if (jaExiste != null)
                 {
                     return BadRequest(new { status = false, message = $"O modelo {modelo.Nome} já esta cadastrado" });

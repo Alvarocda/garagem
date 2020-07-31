@@ -10,7 +10,8 @@ namespace api.Interfaces
     public interface IRepository<T> where T : EntityBase
     {
         Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
+        void Update(T entity);
+        void Disable(T entity);
         Task<List<T>> ListAsync();
         Task<List<T>> ListAsync(Expression<Func<T, bool>> predicate);
         Task<T> Find(int id);

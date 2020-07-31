@@ -22,6 +22,17 @@ namespace api.Repositories
             await _context.AddAsync(entity);
         }
 
+        public void Disable(Fabricante entity)
+        {
+            entity.DesativadoEm = DateTime.Now;
+            entity.Ativo = false;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(f => f.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(f => f.CriadoPor).IsModified = false;
+            _context.Entry(entity).Property(f => f.AtualizadoEm).IsModified = false;
+            _context.Entry(entity).Property(f => f.AtualizadoPor).IsModified = false;
+        }
+
         public async Task<Fabricante> Find(int id)
         {
             return await _context.Fabricantes.FindAsync(id);
@@ -49,15 +60,18 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(Fabricante entity)
+        public void Update(Fabricante entity)
         {
-            throw new NotImplementedException();
+            entity.AtualizadoEm = DateTime.Now;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(f => f.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(f => f.CriadoPor).IsModified = false;
         }
     }
 }

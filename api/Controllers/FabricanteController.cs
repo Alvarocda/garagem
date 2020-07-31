@@ -16,10 +16,8 @@ namespace api.Controllers
     public class FabricanteController : ControllerBase
     {
         private readonly IRepository<Fabricante> _repository;
-        private readonly DataContext _context;
         public FabricanteController(DataContext context, IRepository<Fabricante> repository)
         {
-            _context = context;
             _repository = repository;
 
         }
@@ -65,7 +63,7 @@ namespace api.Controllers
                 }
                 await _repository.AddAsync(fabricante);
                 if(await _repository.SaveChangesAsync()){
-                    return Ok(new {status = true, message = "Fabricante cadastrado com sucesso!", fabricante});
+                    return Ok(new {message = "Fabricante cadastrado com sucesso!", fabricante});
                 }
                 return BadRequest();
             }
@@ -80,11 +78,11 @@ namespace api.Controllers
         {
             if (ModelState.IsValid)
             {
-                fabricante.AtualizadoEm = DateTime.Now;
+                if(fabricante.Id != id){
+                    return BadRequest();
+                }
                 fabricante.AtualizadoPor = User.RetornaIdUsuario();
-                _context.Entry(fabricante).State = EntityState.Modified;
-                _context.Entry(fabricante).Property(f => f.CriadoEm).IsModified = false;
-                _context.Entry(fabricante).Property(f => f.CriadoPor).IsModified = false;
+                _repository.Update(fabricante);
                 if(await _repository.SaveChangesAsync()){
                     return Ok(new {status = true, message = "Fabricante alterado com sucesso!", fabricante});
                 }
@@ -105,14 +103,8 @@ namespace api.Controllers
                 if(fabricante == null){
                     return NotFound();
                 }
-                fabricante.DesativadoEm = DateTime.Now;
                 fabricante.DesativadoPor = User.RetornaIdUsuario();
-                fabricante.Ativo = false;
-                _context.Entry(fabricante).State = EntityState.Modified;
-                _context.Entry(fabricante).Property(f => f.CriadoEm).IsModified = false;
-                _context.Entry(fabricante).Property(f => f.CriadoPor).IsModified = false;
-                _context.Entry(fabricante).Property(f => f.AtualizadoEm).IsModified = false;
-                _context.Entry(fabricante).Property(f => f.AtualizadoPor).IsModified = false;
+                _repository.Disable(fabricante);
                 if(await _repository.SaveChangesAsync()){
                     return Ok(new {status = true, message = "Fabricante desativado com sucesso!"});
                 }

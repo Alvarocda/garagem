@@ -8,13 +8,19 @@ namespace api.Models
     public class Usuario : EntityBase
     {
         [Required(ErrorMessage = "Por favor, informe um email para o usuário")]
-        public string Email {get;set;}
+        [MaxLength(100)]
+        public string Email { get; set; }
+        [Required]
         [JsonIgnore]
-        public byte[] Senha {get;set;}
+        public byte[] Senha { get; set; }
+        [Required]
         [JsonIgnore]
-        public byte[] Chave {get;set;}
+        public byte[] Chave { get; set; }
         [Required(ErrorMessage = "Por favor, informe um nome para o usuário")]
-        public string Nome {get;set;}
-        public string Role {get;set;} = "usuario";
+        [MaxLength(50)]
+        public string Nome { get; set; }
+        [Required]
+        [MaxLength(50)]
+        public string Role { get; set; } = "usuario";
     }
 }

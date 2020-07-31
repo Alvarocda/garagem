@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
 using Microsoft.OpenApi.Models;
+using api.Interfaces;
+using api.Models;
+using api.Repositories;
 
 namespace api
 {
@@ -40,16 +43,30 @@ namespace api
             InicializaJwtAuthentication(services);
             IncializaSwagger(services);
             InicializaConexao(services);
+            InjetaDependencias(services);
         }
-        private static void InicializaJwtAuthentication(IServiceCollection services){
+
+        private void InjetaDependencias(IServiceCollection services){
+            services.AddScoped<IRepository<Fabricante>, FabricanteRepository>();
+            services.AddScoped<IRepository<Imagem>, ImagemRepository>();
+            services.AddScoped<IRepository<Modelo>, ModeloRepository>();
+            services.AddScoped<IRepository<TipoVeiculo>, TipoVeiculoRepository>();
+            services.AddScoped<IRepository<Veiculo>, VeiculoRepository>();
+            services.AddScoped<IUsuarioRepository<Usuario>, UsuarioRepository>();
+        }
+        private static void InicializaJwtAuthentication(IServiceCollection services)
+        {
             var key = Encoding.ASCII.GetBytes(Settings.Secret);
-            services.AddAuthentication(x =>{
-                x.DefaultAuthenticateScheme =  JwtBearerDefaults.AuthenticationScheme;
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>{
+            }).AddJwtBearer(x =>
+            {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters{
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
@@ -68,15 +85,16 @@ namespace api
                     Description = "API para estoque de garagem",
                     Contact = new Microsoft.OpenApi.Models.OpenApiContact() { Name = "Álvaro Claro", Email = "alvaro.claro@hotmail.com" }
                 });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
                     Description = "Token JWT Bearer",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer"
                 });
-                
-                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                     {
                         {
                         new OpenApiSecurityScheme
@@ -98,7 +116,8 @@ namespace api
             });
         }
 
-        private void InicializaConexao(IServiceCollection services){
+        private void InicializaConexao(IServiceCollection services)
+        {
             string connectionString = Configuration.GetConnectionString("Banco");
             services.AddScoped<DataContext, DataContext>();
             services.AddDbContext<DataContext>(opt => opt.UseNpgsql(connectionString));
@@ -113,7 +132,7 @@ namespace api
             }
 
             app.UseHttpsRedirection();
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

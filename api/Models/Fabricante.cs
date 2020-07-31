@@ -7,8 +7,10 @@ namespace api.Models
     [Table("fabricantes")]
     public class Fabricante : EntityBase
     {
-        public string Nome {get;set;}
+        [MaxLength(50)]
+        [Required]
+        public string Nome { get; set; }
         [ForeignKey("FabricanteId")]
-        public ObservableCollection<Modelo> Modelos{get;set;}
+        public ObservableCollection<Modelo> Modelos { get; set; }
     }
 }

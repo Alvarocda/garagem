@@ -22,6 +22,11 @@ namespace api.Repositories
             await _context.Modelos.AddAsync(entity);
         }
 
+        public void Disable(Modelo entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Modelo> Find(int id)
         {
             return await _context.Modelos.FindAsync(id);
@@ -49,13 +54,13 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(Modelo entity)
+        public void Update(Modelo entity)
         {
             throw new NotImplementedException();
         }

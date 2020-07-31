@@ -17,12 +17,11 @@ namespace api.Controllers
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly IRepository<Usuario> _repository;
-        public AuthController(DataContext context, IMapper mapper, IRepository<Usuario>  repository)
+        private readonly IUsuarioRepository<Usuario> _repository;
+        public AuthController(IMapper mapper, IUsuarioRepository<Usuario> repository)
         {
             _repository = repository;
             _mapper = mapper;
-            _context = context;
         }
 
         [HttpPost]

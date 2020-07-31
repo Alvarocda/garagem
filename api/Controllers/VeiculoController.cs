@@ -17,18 +17,18 @@ namespace api.Controllers
     public class VeiculoController : ControllerBase
     {
         private readonly IRepository<Veiculo> _repository;
-        private readonly DataContext _context;
-        public VeiculoController(DataContext context, IRepository<Veiculo> repository)
+        public VeiculoController(IRepository<Veiculo> repository)
         {
-            _context = context;
             _repository = repository;
         }
 
         [HttpGet]
-        [Authorize(Roles= "administrador,usuario")]
-        public async Task<ActionResult<List<Veiculo>>> GetVeiculos([FromQuery] bool listaFabricantes){
+        [Authorize(Roles = "administrador,usuario")]
+        public async Task<ActionResult<List<Veiculo>>> GetVeiculos([FromQuery] bool listaFabricantes)
+        {
             IQueryable<Veiculo> veiculos = _repository.Query();
-            if(listaFabricantes){
+            if (listaFabricantes)
+            {
                 veiculos = veiculos.Include(v => v.Fabricante);
             }
             return await veiculos.OrderByDescending(v => v.Id).ToListAsync();
@@ -36,13 +36,15 @@ namespace api.Controllers
 
         [Authorize(Roles = "administrador, usuario")]
         [HttpPost]
-        public async Task<ActionResult<Veiculo>> CadastraVeiculo([FromBody]Veiculo veiculo){
-            if(ModelState.IsValid){
-                veiculo.CriadoEm = DateTime.Now;
+        public async Task<ActionResult<Veiculo>> CadastraVeiculo([FromBody] Veiculo veiculo)
+        {
+            if (ModelState.IsValid)
+            {
                 veiculo.CriadoPor = User.RetornaIdUsuario();
                 await _repository.AddAsync(veiculo);
-                if(await _repository.SaveChangesAsync()){
-                    return Ok(new {status = true, veiculo});
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok(new { status = true, veiculo });
                 }
                 return BadRequest();
             }
@@ -50,16 +52,15 @@ namespace api.Controllers
         }
         [Authorize(Roles = "administrador,usuario")]
         [HttpPut("{veiculoId}")]
-        public async Task<ActionResult<Veiculo>> UpdateVeiculo([FromRoute] int veiculoId, [FromBody]Veiculo veiculo){
-            if(ModelState.IsValid){
-                _context.Entry(veiculo).State = EntityState.Modified;
-                veiculo.AtualizadoEm = DateTime.Now;
+        public async Task<ActionResult<Veiculo>> UpdateVeiculo([FromRoute] int veiculoId, [FromBody] Veiculo veiculo)
+        {
+            if (ModelState.IsValid)
+            {
                 veiculo.AtualizadoPor = User.RetornaIdUsuario();
-                _context.Entry(veiculo).State = EntityState.Modified;
-                _context.Entry(veiculo).Property(v => v.CriadoEm).IsModified = false;
-                _context.Entry(veiculo).Property(v => v.CriadoPor).IsModified = false;
-                if(await _repository.SaveChangesAsync()){
-                    return Ok(new {status = true, veiculo});
+                _repository.Update(veiculo);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok(new { status = true, veiculo });
                 }
                 return BadRequest();
             }
@@ -68,21 +69,17 @@ namespace api.Controllers
 
         [HttpDelete("{veiculoId}")]
         [Authorize(Roles = "administrador")]
-        public async Task<ActionResult<object>> DeleteVeiculo([FromRoute] int veiculoId){
+        public async Task<ActionResult<object>> DeleteVeiculo([FromRoute] int veiculoId)
+        {
             Veiculo veiculo = await _repository.Find(veiculoId);
-            if(veiculo == null){
+            if (veiculo == null)
+            {
                 return BadRequest();
             }
-            veiculo.Ativo = false;
-            veiculo.Status = "R";
-            veiculo.DesativadoEm = DateTime.Now;
             veiculo.DesativadoPor = User.RetornaIdUsuario();
-            _context.Entry(veiculo).State = EntityState.Modified;
-            _context.Entry(veiculo).Property(v => v.CriadoEm).IsModified = false;
-            _context.Entry(veiculo).Property(v => v.CriadoPor).IsModified = false;
-            _context.Entry(veiculo).Property(v => v.AtualizadoEm).IsModified = false;
-            _context.Entry(veiculo).Property(v => v.AtualizadoPor).IsModified = false;
-            if(await _repository.SaveChangesAsync()){
+            _repository.Disable(veiculo);
+            if (await _repository.SaveChangesAsync())
+            {
                 return Ok();
             }
             return BadRequest();

@@ -22,6 +22,17 @@ namespace api.Repositories
             await _context.Veiculos.AddAsync(entity);
         }
 
+        public void Disable(Veiculo entity)
+        {
+            entity.Ativo = false;
+            entity.Status = "R";
+            entity.DesativadoEm = DateTime.Now;
+            _context.Entry(entity).Property(v => v.AtualizadoEm).IsModified = false;
+            _context.Entry(entity).Property(v => v.AtualizadoPor).IsModified = false;
+            _context.Entry(entity).Property(v => v.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(v => v.CriadoPor).IsModified = false;
+        }
+
         public async Task<Veiculo> Find(int id)
         {
             return await _context.Veiculos.FindAsync(id);
@@ -49,15 +60,20 @@ namespace api.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            if(await _context.SaveChangesAsync() == 1)
+            if (await _context.SaveChangesAsync() == 1)
                 return true;
-                
+
             return false;
         }
 
-        public Task UpdateAsync(Veiculo entity)
+        public void Update(Veiculo entity)
         {
-            throw new NotImplementedException();
+            entity.AtualizadoEm = DateTime.Now;
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).Property(v => v.CriadoEm).IsModified = false;
+            _context.Entry(entity).Property(v => v.CriadoPor).IsModified = false;
+            _context.Entry(entity).Property(v => v.AtualizadoEm).IsModified = false;
+            _context.Entry(entity).Property(v => v.AtualizadoPor).IsModified = false;
         }
     }
 }
